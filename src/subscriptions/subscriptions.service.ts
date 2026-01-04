@@ -38,7 +38,6 @@ export class SubscriptionsService {
         }
 
         const subscription = this.subscriptionsRepository.create({
-            id: uuidv4(),
             ...createSubscriptionDto,
             price,
             startDate: new Date(),
@@ -47,11 +46,14 @@ export class SubscriptionsService {
 
         const savedSubscription = await this.subscriptionsRepository.save(subscription);
 
-        // Create initial payment
+        // Create initial payment - due in 3 days
+        const paymentDueDate = new Date();
+        paymentDueDate.setDate(paymentDueDate.getDate() + 3);
+
         await this.paymentsService.create({
             subscriptionId: savedSubscription.id,
-            amount: price,
-            dueDate: nextDueDate,
+            totalAmount: price,
+            dueDate: paymentDueDate,
         });
 
         return savedSubscription;
@@ -60,13 +62,55 @@ export class SubscriptionsService {
     async findAll(): Promise<Subscription[]> {
         return await this.subscriptionsRepository.find({
             relations: ['customer', 'package', 'payments'],
+            order: { createdAt: 'DESC' },
         });
+    }
+
+    async findOne(id: string): Promise<Subscription> {
+        const sub = await this.subscriptionsRepository.findOne({
+            where: { id },
+            relations: ['customer', 'package', 'payments'],
+        });
+        if (!sub) throw new Error('Subscription not found');
+        return sub;
+    }
+
+    async update(id: string, updateDto: Partial<CreateSubscriptionDto>): Promise<Subscription> {
+        const currentSub = await this.findOne(id);
+        const pkgId = updateDto.packageId || currentSub.packageId;
+        const cycle = updateDto.paymentCycle || currentSub.paymentCycle;
+
+        if (updateDto.packageId || updateDto.paymentCycle) {
+            const pkg = await this.packagesService.findOne(pkgId);
+            let price: number = currentSub.price;
+
+            switch (cycle) {
+                case PaymentCycle.MONTHLY:
+                    price = pkg.monthlyPrice;
+                    break;
+                case PaymentCycle.THREE_MONTHS:
+                    price = pkg.threeMonthsPrice;
+                    break;
+                case PaymentCycle.YEARLY:
+                    price = pkg.yearlyPrice;
+                    break;
+            }
+            (updateDto as any).price = price;
+        }
+
+        await this.subscriptionsRepository.update(id, updateDto);
+        return this.findOne(id);
+    }
+
+    async remove(id: string): Promise<void> {
+        await this.subscriptionsRepository.delete(id);
     }
 
     async findByCustomer(customerId: string): Promise<Subscription[]> {
         return await this.subscriptionsRepository.find({
             where: { customerId },
             relations: ['package', 'payments'],
+            order: { createdAt: 'DESC' },
         });
     }
 }

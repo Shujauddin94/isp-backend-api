@@ -1,7 +1,11 @@
 import { PackagesService } from './packages.service';
+import { Package } from './package.entity';
 export declare class PackagesController {
     private readonly packagesService;
     constructor(packagesService: PackagesService);
-    findAll(): Promise<import("./package.entity").Package[]>;
-    findOne(id: string): Promise<import("./package.entity").Package>;
+    create(data: Partial<Package>): Promise<Package>;
+    findAll(): Promise<Package[]>;
+    findOne(id: string): Promise<Package>;
+    update(id: string, data: Partial<Package>): Promise<Package>;
+    remove(id: string): Promise<void>;
 }

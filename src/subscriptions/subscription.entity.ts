@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, OneToMany, JoinColumn } from 'typeorm';
 import { Customer } from '../customers/customer.entity';
 import { Package } from '../packages/package.entity';
 import { Payment } from '../payments/payment.entity';
@@ -17,7 +17,7 @@ export enum SubscriptionStatus {
 
 @Entity('subscriptions')
 export class Subscription {
-    @PrimaryColumn('varchar', { length: 36 })
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ name: 'customer_id' })

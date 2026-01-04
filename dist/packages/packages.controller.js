@@ -20,14 +20,30 @@ let PackagesController = class PackagesController {
     constructor(packagesService) {
         this.packagesService = packagesService;
     }
+    create(data) {
+        return this.packagesService.create(data);
+    }
     findAll() {
         return this.packagesService.findAll();
     }
     findOne(id) {
         return this.packagesService.findOne(id);
     }
+    update(id, data) {
+        return this.packagesService.update(id, data);
+    }
+    remove(id) {
+        return this.packagesService.remove(id);
+    }
 };
 exports.PackagesController = PackagesController;
+__decorate([
+    (0, common_1.Post)(),
+    __param(0, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object]),
+    __metadata("design:returntype", void 0)
+], PackagesController.prototype, "create", null);
 __decorate([
     (0, common_1.Get)(),
     __metadata("design:type", Function),
@@ -41,6 +57,21 @@ __decorate([
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", void 0)
 ], PackagesController.prototype, "findOne", null);
+__decorate([
+    (0, common_1.Patch)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object]),
+    __metadata("design:returntype", void 0)
+], PackagesController.prototype, "update", null);
+__decorate([
+    (0, common_1.Delete)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", void 0)
+], PackagesController.prototype, "remove", null);
 exports.PackagesController = PackagesController = __decorate([
     (0, common_1.Controller)('packages'),
     __metadata("design:paramtypes", [packages_service_1.PackagesService])

@@ -35,6 +35,17 @@ let PackagesService = class PackagesService {
         }
         return pkg;
     }
+    async create(data) {
+        const pkg = this.packagesRepository.create(data);
+        return this.packagesRepository.save(pkg);
+    }
+    async update(id, data) {
+        await this.packagesRepository.update(id, data);
+        return this.findOne(id);
+    }
+    async remove(id) {
+        await this.packagesRepository.delete(id);
+    }
 };
 exports.PackagesService = PackagesService;
 exports.PackagesService = PackagesService = __decorate([

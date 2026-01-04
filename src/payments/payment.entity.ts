@@ -1,4 +1,4 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, ManyToOne, JoinColumn } from 'typeorm';
 import { Subscription } from '../subscriptions/subscription.entity';
 
 export enum PaymentStatus {
@@ -6,18 +6,28 @@ export enum PaymentStatus {
     PAID = 'paid',
     OVERDUE = 'overdue',
     FAILED = 'failed',
+    PARTIALLY_PAID = 'partially_paid',
 }
 
 @Entity('payments')
 export class Payment {
-    @PrimaryColumn('varchar', { length: 36 })
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column({ name: 'subscription_id' })
     subscriptionId: string;
 
-    @Column('decimal', { precision: 10, scale: 2 })
-    amount: number;
+    @Column('decimal', { name: 'total_amount', precision: 10, scale: 2 })
+    totalAmount: number;
+
+    @Column('decimal', { name: 'paid_amount', precision: 10, scale: 2, default: 0 })
+    paidAmount: number;
+
+    @Column({ type: 'decimal', name: 'pending_amount', precision: 10, scale: 2, insert: false, update: false })
+    pendingAmount: number;
+
+    @Column('decimal', { name: 'penalty_amount', precision: 10, scale: 2, default: 0 })
+    penaltyAmount: number;
 
     @Column({
         type: 'enum',
@@ -26,11 +36,11 @@ export class Payment {
     })
     status: PaymentStatus;
 
-    @Column({ name: 'due_date', type: 'timestamp' })
+    @Column({ name: 'due_date', type: 'timestamp with time zone' })
     dueDate: Date;
 
-    @Column({ name: 'paid_date', type: 'timestamp', nullable: true })
-    paidDate: Date | null;
+    @Column({ name: 'paid_at', type: 'timestamp with time zone', nullable: true })
+    paidAt: Date | null;
 
     @Column('varchar', { name: 'transaction_id', length: 100, nullable: true })
     transactionId: string | null;

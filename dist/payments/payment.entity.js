@@ -18,14 +18,18 @@ var PaymentStatus;
     PaymentStatus["PAID"] = "paid";
     PaymentStatus["OVERDUE"] = "overdue";
     PaymentStatus["FAILED"] = "failed";
+    PaymentStatus["PARTIALLY_PAID"] = "partially_paid";
 })(PaymentStatus || (exports.PaymentStatus = PaymentStatus = {}));
 let Payment = class Payment {
     id;
     subscriptionId;
-    amount;
+    totalAmount;
+    paidAmount;
+    pendingAmount;
+    penaltyAmount;
     status;
     dueDate;
-    paidDate;
+    paidAt;
     transactionId;
     createdAt;
     updatedAt;
@@ -33,7 +37,7 @@ let Payment = class Payment {
 };
 exports.Payment = Payment;
 __decorate([
-    (0, typeorm_1.PrimaryColumn)('varchar', { length: 36 }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Payment.prototype, "id", void 0);
 __decorate([
@@ -41,9 +45,21 @@ __decorate([
     __metadata("design:type", String)
 ], Payment.prototype, "subscriptionId", void 0);
 __decorate([
-    (0, typeorm_1.Column)('decimal', { precision: 10, scale: 2 }),
+    (0, typeorm_1.Column)('decimal', { name: 'total_amount', precision: 10, scale: 2 }),
     __metadata("design:type", Number)
-], Payment.prototype, "amount", void 0);
+], Payment.prototype, "totalAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { name: 'paid_amount', precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Payment.prototype, "paidAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)({ type: 'decimal', name: 'pending_amount', precision: 10, scale: 2, insert: false, update: false }),
+    __metadata("design:type", Number)
+], Payment.prototype, "pendingAmount", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { name: 'penalty_amount', precision: 10, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Payment.prototype, "penaltyAmount", void 0);
 __decorate([
     (0, typeorm_1.Column)({
         type: 'enum',
@@ -53,13 +69,13 @@ __decorate([
     __metadata("design:type", String)
 ], Payment.prototype, "status", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'due_date', type: 'timestamp' }),
+    (0, typeorm_1.Column)({ name: 'due_date', type: 'timestamp with time zone' }),
     __metadata("design:type", Date)
 ], Payment.prototype, "dueDate", void 0);
 __decorate([
-    (0, typeorm_1.Column)({ name: 'paid_date', type: 'timestamp', nullable: true }),
+    (0, typeorm_1.Column)({ name: 'paid_at', type: 'timestamp with time zone', nullable: true }),
     __metadata("design:type", Object)
-], Payment.prototype, "paidDate", void 0);
+], Payment.prototype, "paidAt", void 0);
 __decorate([
     (0, typeorm_1.Column)('varchar', { name: 'transaction_id', length: 100, nullable: true }),
     __metadata("design:type", Object)

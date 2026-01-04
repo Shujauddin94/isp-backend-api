@@ -1,9 +1,9 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn, OneToMany } from 'typeorm';
 import { Subscription } from '../subscriptions/subscription.entity';
 
 @Entity('customers')
 export class Customer {
-  @PrimaryColumn('varchar', { length: 36 })
+  @PrimaryGeneratedColumn('uuid')
   id: string;
 
   @Column({ name: 'full_name' })

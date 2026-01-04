@@ -1,4 +1,4 @@
-import { Controller, Get, Patch, Param } from '@nestjs/common';
+import { Controller, Get, Patch, Param, Body } from '@nestjs/common';
 import { PaymentsService } from './payments.service';
 
 @Controller('payments')
@@ -10,8 +10,8 @@ export class PaymentsController {
         return this.paymentsService.findAll();
     }
 
-    @Patch(':id/mark-paid')
-    markAsPaid(@Param('id') id: string) {
-        return this.paymentsService.markAsPaid(id);
+    @Patch(':id/pay')
+    recordPayment(@Param('id') id: string, @Body('amount') amount: number) {
+        return this.paymentsService.recordPayment(id, amount);
     }
 }

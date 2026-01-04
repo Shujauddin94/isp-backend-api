@@ -13,28 +13,56 @@ export class PaymentsService {
 
     async create(data: {
         subscriptionId: string;
-        amount: number;
+        totalAmount: number;
         dueDate: Date;
     }): Promise<Payment> {
         const payment = this.paymentsRepository.create({
-            id: uuidv4(),
             ...data,
             status: PaymentStatus.PENDING,
         });
         return await this.paymentsRepository.save(payment);
     }
 
-    async markAsPaid(id: string): Promise<Payment> {
-        await this.paymentsRepository.update(id, {
-            status: PaymentStatus.PAID,
-            paidDate: new Date(),
-            transactionId: `TXN-${Date.now()}`,
+    async recordPayment(id: string, paidAmount: number): Promise<Payment> {
+        const payment = await this.paymentsRepository.findOne({
+            where: { id },
+            relations: ['subscription', 'subscription.package'],
         });
-        const payment = await this.paymentsRepository.findOne({ where: { id } });
+
         if (!payment) {
             throw new NotFoundException(`Payment with ID ${id} not found`);
         }
-        return payment;
+
+        const now = new Date();
+        let penaltyAmount = 0;
+
+        // Calculate penalty if overdue
+        if (now > payment.dueDate && payment.status === PaymentStatus.PENDING) {
+            const penaltyRate = payment.subscription.package.penaltyRate || 0;
+            penaltyAmount = (Number(payment.totalAmount) * penaltyRate) / 100;
+        }
+
+        const totalDue = Number(payment.totalAmount) + penaltyAmount;
+        const newPaidAmount = Number(payment.paidAmount) + paidAmount;
+
+        let status = PaymentStatus.PARTIALLY_PAID;
+        if (newPaidAmount >= totalDue) {
+            status = PaymentStatus.PAID;
+        }
+
+        await this.paymentsRepository.update(id, {
+            paidAmount: newPaidAmount,
+            penaltyAmount: penaltyAmount,
+            status: status,
+            paidAt: now,
+            transactionId: `TXN-${Date.now()}`,
+        });
+
+        const updatedPayment = await this.paymentsRepository.findOne({ where: { id } });
+        if (!updatedPayment) {
+            throw new NotFoundException(`Payment with ID ${id} not found after update`);
+        }
+        return updatedPayment;
     }
 
     async updateOverduePayments(): Promise<void> {
@@ -49,7 +77,7 @@ export class PaymentsService {
 
     async findAll(): Promise<Payment[]> {
         return await this.paymentsRepository.find({
-            relations: ['subscription'],
+            relations: ['subscription', 'subscription.customer', 'subscription.package'],
             order: { dueDate: 'DESC' },
         });
     }

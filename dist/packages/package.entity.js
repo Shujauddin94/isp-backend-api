@@ -19,6 +19,7 @@ let Package = class Package {
     threeMonthsPrice;
     yearlyPrice;
     features;
+    penaltyRate;
     isPopular;
     isActive;
     createdAt;
@@ -26,7 +27,7 @@ let Package = class Package {
 };
 exports.Package = Package;
 __decorate([
-    (0, typeorm_1.PrimaryColumn)('varchar', { length: 36 }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Package.prototype, "id", void 0);
 __decorate([
@@ -50,9 +51,13 @@ __decorate([
     __metadata("design:type", Number)
 ], Package.prototype, "yearlyPrice", void 0);
 __decorate([
-    (0, typeorm_1.Column)('json'),
+    (0, typeorm_1.Column)('jsonb'),
     __metadata("design:type", Array)
 ], Package.prototype, "features", void 0);
+__decorate([
+    (0, typeorm_1.Column)('decimal', { name: 'penalty_rate', precision: 5, scale: 2, default: 0 }),
+    __metadata("design:type", Number)
+], Package.prototype, "penaltyRate", void 0);
 __decorate([
     (0, typeorm_1.Column)({ name: 'is_popular', default: false }),
     __metadata("design:type", Boolean)

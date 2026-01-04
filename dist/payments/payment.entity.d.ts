@@ -3,15 +3,19 @@ export declare enum PaymentStatus {
     PENDING = "pending",
     PAID = "paid",
     OVERDUE = "overdue",
-    FAILED = "failed"
+    FAILED = "failed",
+    PARTIALLY_PAID = "partially_paid"
 }
 export declare class Payment {
     id: string;
     subscriptionId: string;
-    amount: number;
+    totalAmount: number;
+    paidAmount: number;
+    pendingAmount: number;
+    penaltyAmount: number;
     status: PaymentStatus;
     dueDate: Date;
-    paidDate: Date | null;
+    paidAt: Date | null;
     transactionId: string | null;
     createdAt: Date;
     updatedAt: Date;

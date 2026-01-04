@@ -1,8 +1,8 @@
-import { Entity, Column, PrimaryColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
+import { Entity, Column, PrimaryGeneratedColumn, CreateDateColumn, UpdateDateColumn } from 'typeorm';
 
 @Entity('packages')
 export class Package {
-    @PrimaryColumn('varchar', { length: 36 })
+    @PrimaryGeneratedColumn('uuid')
     id: string;
 
     @Column()
@@ -20,8 +20,11 @@ export class Package {
     @Column('decimal', { name: 'yearly_price', precision: 10, scale: 2 })
     yearlyPrice: number;
 
-    @Column('json')
+    @Column('jsonb')
     features: string[];
+
+    @Column('decimal', { name: 'penalty_rate', precision: 5, scale: 2, default: 0 })
+    penaltyRate: number;
 
     @Column({ name: 'is_popular', default: false })
     isPopular: boolean;

@@ -10,5 +10,8 @@ export declare class SubscriptionsService {
     constructor(subscriptionsRepository: Repository<Subscription>, packagesService: PackagesService, paymentsService: PaymentsService);
     create(createSubscriptionDto: CreateSubscriptionDto): Promise<Subscription>;
     findAll(): Promise<Subscription[]>;
+    findOne(id: string): Promise<Subscription>;
+    update(id: string, updateDto: Partial<CreateSubscriptionDto>): Promise<Subscription>;
+    remove(id: string): Promise<void>;
     findByCustomer(customerId: string): Promise<Subscription[]>;
 }

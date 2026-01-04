@@ -43,7 +43,7 @@ let Subscription = class Subscription {
 };
 exports.Subscription = Subscription;
 __decorate([
-    (0, typeorm_1.PrimaryColumn)('varchar', { length: 36 }),
+    (0, typeorm_1.PrimaryGeneratedColumn)('uuid'),
     __metadata("design:type", String)
 ], Subscription.prototype, "id", void 0);
 __decorate([

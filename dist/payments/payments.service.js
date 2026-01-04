@@ -17,7 +17,6 @@ const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const typeorm_2 = require("typeorm");
 const payment_entity_1 = require("./payment.entity");
-const uuid_1 = require("uuid");
 let PaymentsService = class PaymentsService {
     paymentsRepository;
     constructor(paymentsRepository) {
@@ -25,23 +24,43 @@ let PaymentsService = class PaymentsService {
     }
     async create(data) {
         const payment = this.paymentsRepository.create({
-            id: (0, uuid_1.v4)(),
             ...data,
             status: payment_entity_1.PaymentStatus.PENDING,
         });
         return await this.paymentsRepository.save(payment);
     }
-    async markAsPaid(id) {
-        await this.paymentsRepository.update(id, {
-            status: payment_entity_1.PaymentStatus.PAID,
-            paidDate: new Date(),
-            transactionId: `TXN-${Date.now()}`,
+    async recordPayment(id, paidAmount) {
+        const payment = await this.paymentsRepository.findOne({
+            where: { id },
+            relations: ['subscription', 'subscription.package'],
         });
-        const payment = await this.paymentsRepository.findOne({ where: { id } });
         if (!payment) {
             throw new common_1.NotFoundException(`Payment with ID ${id} not found`);
         }
-        return payment;
+        const now = new Date();
+        let penaltyAmount = 0;
+        if (now > payment.dueDate && payment.status === payment_entity_1.PaymentStatus.PENDING) {
+            const penaltyRate = payment.subscription.package.penaltyRate || 0;
+            penaltyAmount = (Number(payment.totalAmount) * penaltyRate) / 100;
+        }
+        const totalDue = Number(payment.totalAmount) + penaltyAmount;
+        const newPaidAmount = Number(payment.paidAmount) + paidAmount;
+        let status = payment_entity_1.PaymentStatus.PARTIALLY_PAID;
+        if (newPaidAmount >= totalDue) {
+            status = payment_entity_1.PaymentStatus.PAID;
+        }
+        await this.paymentsRepository.update(id, {
+            paidAmount: newPaidAmount,
+            penaltyAmount: penaltyAmount,
+            status: status,
+            paidAt: now,
+            transactionId: `TXN-${Date.now()}`,
+        });
+        const updatedPayment = await this.paymentsRepository.findOne({ where: { id } });
+        if (!updatedPayment) {
+            throw new common_1.NotFoundException(`Payment with ID ${id} not found after update`);
+        }
+        return updatedPayment;
     }
     async updateOverduePayments() {
         await this.paymentsRepository.update({
@@ -51,7 +70,7 @@ let PaymentsService = class PaymentsService {
     }
     async findAll() {
         return await this.paymentsRepository.find({
-            relations: ['subscription'],
+            relations: ['subscription', 'subscription.customer', 'subscription.package'],
             order: { dueDate: 'DESC' },
         });
     }

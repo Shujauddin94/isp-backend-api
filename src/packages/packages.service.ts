@@ -24,4 +24,18 @@ export class PackagesService {
         }
         return pkg;
     }
+
+    async create(data: Partial<Package>): Promise<Package> {
+        const pkg = this.packagesRepository.create(data);
+        return this.packagesRepository.save(pkg);
+    }
+
+    async update(id: string, data: Partial<Package>): Promise<Package> {
+        await this.packagesRepository.update(id, data);
+        return this.findOne(id);
+    }
+
+    async remove(id: string): Promise<void> {
+        await this.packagesRepository.delete(id);
+    }
 }

@@ -5,10 +5,10 @@ export declare class PaymentsService {
     constructor(paymentsRepository: Repository<Payment>);
     create(data: {
         subscriptionId: string;
-        amount: number;
+        totalAmount: number;
         dueDate: Date;
     }): Promise<Payment>;
-    markAsPaid(id: string): Promise<Payment>;
+    recordPayment(id: string, paidAmount: number): Promise<Payment>;
     updateOverduePayments(): Promise<void>;
     findAll(): Promise<Payment[]>;
 }

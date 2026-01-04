@@ -5,4 +5,7 @@ export declare class PackagesService {
     constructor(packagesRepository: Repository<Package>);
     findAll(): Promise<Package[]>;
     findOne(id: string): Promise<Package>;
+    create(data: Partial<Package>): Promise<Package>;
+    update(id: string, data: Partial<Package>): Promise<Package>;
+    remove(id: string): Promise<void>;
 }

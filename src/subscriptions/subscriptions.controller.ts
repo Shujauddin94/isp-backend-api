@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Body, Param } from '@nestjs/common';
+import { Controller, Get, Post, Body, Param, Patch, Delete } from '@nestjs/common';
 import { SubscriptionsService } from './subscriptions.service';
 import { CreateSubscriptionDto } from './dto/create-subscription.dto';
 
@@ -14,6 +14,21 @@ export class SubscriptionsController {
     @Get()
     findAll() {
         return this.subscriptionsService.findAll();
+    }
+
+    @Get(':id')
+    findOne(@Param('id') id: string) {
+        return this.subscriptionsService.findOne(id);
+    }
+
+    @Patch(':id')
+    update(@Param('id') id: string, @Body() updateDto: Partial<CreateSubscriptionDto>) {
+        return this.subscriptionsService.update(id, updateDto);
+    }
+
+    @Delete(':id')
+    remove(@Param('id') id: string) {
+        return this.subscriptionsService.remove(id);
     }
 
     @Get('customer/:customerId')

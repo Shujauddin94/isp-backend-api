@@ -23,8 +23,8 @@ let PaymentsController = class PaymentsController {
     findAll() {
         return this.paymentsService.findAll();
     }
-    markAsPaid(id) {
-        return this.paymentsService.markAsPaid(id);
+    recordPayment(id, amount) {
+        return this.paymentsService.recordPayment(id, amount);
     }
 };
 exports.PaymentsController = PaymentsController;
@@ -35,12 +35,13 @@ __decorate([
     __metadata("design:returntype", void 0)
 ], PaymentsController.prototype, "findAll", null);
 __decorate([
-    (0, common_1.Patch)(':id/mark-paid'),
+    (0, common_1.Patch)(':id/pay'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)('amount')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, Number]),
     __metadata("design:returntype", void 0)
-], PaymentsController.prototype, "markAsPaid", null);
+], PaymentsController.prototype, "recordPayment", null);
 exports.PaymentsController = PaymentsController = __decorate([
     (0, common_1.Controller)('payments'),
     __metadata("design:paramtypes", [payments_service_1.PaymentsService])

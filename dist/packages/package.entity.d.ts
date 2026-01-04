@@ -6,6 +6,7 @@ export declare class Package {
     threeMonthsPrice: number;
     yearlyPrice: number;
     features: string[];
+    penaltyRate: number;
     isPopular: boolean;
     isActive: boolean;
     createdAt: Date;
