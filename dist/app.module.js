@@ -10,6 +10,8 @@ exports.AppModule = void 0;
 const common_1 = require("@nestjs/common");
 const typeorm_1 = require("@nestjs/typeorm");
 const config_1 = require("@nestjs/config");
+const app_controller_1 = require("./app.controller");
+const app_service_1 = require("./app.service");
 const customers_module_1 = require("./customers/customers.module");
 const packages_module_1 = require("./packages/packages.module");
 const subscriptions_module_1 = require("./subscriptions/subscriptions.module");
@@ -42,6 +44,8 @@ exports.AppModule = AppModule = __decorate([
             subscriptions_module_1.SubscriptionsModule,
             payments_module_1.PaymentsModule,
         ],
+        controllers: [app_controller_1.AppController],
+        providers: [app_service_1.AppService],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map
